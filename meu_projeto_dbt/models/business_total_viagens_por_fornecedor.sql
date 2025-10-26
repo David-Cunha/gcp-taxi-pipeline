@@ -22,4 +22,4 @@ left join
 
 group by
     -- Agrupamos pelo nome descritivo
-    1
+    1   
