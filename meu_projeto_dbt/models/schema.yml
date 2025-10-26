@@ -2,7 +2,7 @@ version: 2
 
 models:
   - name: stg_nyc_taxi_train
-    description: "Nossa camada 'Refined' (Prata). Limpa e renomeia colunas da tabela raw. Remove viagens com 0 passageiros."
+    description: "Camada Refined (Prata). Limpa e renomeia colunas da tabela raw."
     columns:
       - name: id_viagem
         description: "A chave primária única para cada viagem."
@@ -10,11 +10,54 @@ models:
           - unique
           - not_null
 
-  - name: business_total_viagens_por_fornecedor
-    description: "Nossa camada 'Business' (Ouro). Agrega métricas de viagem por fornecedor (vendor_id)."
+  - name: dim_vendor
+    description: "Dimensão de Fornecedores. Traduz IDs em nomes legíveis."
     columns:
       - name: id_fornecedor
-        description: "O ID do fornecedor (1 ou 2)."
+        description: "Chave primária da dimensão de fornecedor."
+        tests:
+          - unique
+          - not_null
+
+  - name: dim_datetime
+    description: "Dimensão de Tempo. Quebra o timestamp de embarque em partes."
+    columns:
+      - name: id_datetime
+        description: "Chave primária (timestamp único) da dimensão de tempo."
+        tests:
+          - unique
+          - not_null
+
+  - name: fct_trips
+    description: "Tabela Fato principal. Contém métricas e chaves estrangeiras."
+    columns:
+      - name: id_viagem
+        description: "Chave primária da tabela fato."
+        tests:
+          - unique
+          - not_null
+
+      # Este é o teste de Chave Estrangeira (FK)!
+      - name: id_fornecedor
+        description: "Chave estrangeira para dim_vendor."
+        tests:
+          - relationships:
+              to: ref('dim_vendor')
+              field: id_fornecedor
+
+      # Este é o teste de Chave Estrangeira (FK)!
+      - name: data_hora_embarque
+        description: "Chave estrangeira para dim_datetime (usando o ID id_datetime)."
+        tests:
+          - relationships:
+              to: ref('dim_datetime')
+              field: id_datetime
+
+  - name: business_total_viagens_por_fornecedor
+    description: "Camada Business (Ouro). Agrega métricas por nome do fornecedor."
+    columns:
+      - name: nome_fornecedor
+        description: "Nome do fornecedor vindo da dimensão."
         tests:
           - unique
           - not_null
