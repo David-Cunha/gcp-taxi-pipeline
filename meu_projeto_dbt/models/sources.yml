@@ -1,0 +1,8 @@
+version: 2
+
+sources:
+  - name: raw # Um nome para o grupo de fontes
+    database: nyc-taxi-pipeline-476321 # O nome do seu projeto no GCP
+    schema: nyc_taxi_raw               # O dataset onde estão os dados brutos
+    tables:
+      - name: train                    # O nome da tabela de origem
